@@ -1,32 +1,49 @@
+/*
+La pantalla RestaurantsScreen debería renderizar una lista de restaurantes que pertenecen al propietario. 
+Cada elemento debería renderizar al menos el nombre del restaurante, 
+y si se hace clic o se toca en un elemento, debería navegar a la pantalla de detalles del restaurante de ese restaurante.
+*/
+
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'    //para usar hooks necesarios
 import { StyleSheet, View, FlatList, Pressable } from 'react-native'
 import TextRegular from '../../components/TextRegular'
 import { getAll } from '../../api/RestaurantEndpoints'
 import * as GlobalStyles from '../../styles/GlobalStyles'
 
 export default function RestaurantsScreen({ navigation }) {
-  return (
-    <View style={styles.container}>
-      <TextRegular style={{ fontSize: 16, alignSelf: 'center', margin: 20 }}>Random Restaurant</TextRegular>
+
+  const [restaurants, setRestaurants] = useState([]) //array donde almacenar lista de restaurantes
+
+  useEffect(() => { //para cargar restaurantes en el estado
+    console.log('Loading restaurants, please wait 2 seconds')
+    setTimeout(() => {
+      setRestaurants(getAll) // getAll function has to be imported
+      console.log('Restaurants loaded')
+    }, 2000)
+  }, [])
+
+  const renderRestaurant = ({ item }) => { //renderiza el restautante
+    return (
       <Pressable
+        style={styles.row}
         onPress={() => {
-          navigation.navigate('RestaurantDetailScreen', { id: Math.floor(Math.random() * 100) })
-        }}
-        style={({ pressed }) => [
-          {
-            backgroundColor: pressed
-              ? GlobalStyles.brandBlueTap
-              : GlobalStyles.brandBlue
-          },
-          styles.actionButton
-        ]}
-      >
-        <TextRegular textStyle={styles.text}>
-          Go to Random Restaurant Details
-        </TextRegular>
+          navigation.navigate('RestaurantDetailScreen', { id: item.id }) //al clicar muestra el id
+        }}>
+          <TextRegular>
+              {item.name}
+          </TextRegular>
       </Pressable>
-    </View>
+    )
+  }
+
+  return (
+  <FlatList //lista con restaurantes mostrada
+    style={styles.container}
+    data={restaurants}
+    renderItem={renderRestaurant}
+    keyExtractor={item => item.id.toString()}
+  />
   )
 }
 
